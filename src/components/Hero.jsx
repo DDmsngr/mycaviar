@@ -3,10 +3,7 @@ import { ArrowRight, ChevronDown } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import Hls from 'hls.js'
 
-// Замените на ваш HLS-стрим или MP4-ссылку
-const VIDEO_SRC = null
-// Пример HLS: 'https://your-cdn.com/stream/playlist.m3u8'
-// Пример MP4: 'https://your-cdn.com/video/hero.mp4'
+const VIDEO_SRC = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_064122_c4750c0e-7476-4b44-94a2-a85a65c63bf2.mp4'
 
 const stats = [
   { value: '20+',   label: 'лет на рынке' },
