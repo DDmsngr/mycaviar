@@ -4,7 +4,6 @@ import Advantages from '../components/Advantages'
 import CatalogPreview from '../components/CatalogPreview'
 import Clients from '../components/Clients'
 import PriceRequest from '../components/PriceRequest'
-import FAQ from '../components/FAQ'
 
 export default function HomePage() {
   return (
@@ -15,7 +14,6 @@ export default function HomePage() {
       <CatalogPreview />
       <Clients />
       <PriceRequest />
-      <FAQ />
     </>
   )
 }
