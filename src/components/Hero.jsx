@@ -1,99 +1,130 @@
+import { useEffect, useRef } from 'react'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import Ship from './Ship'
+import Hls from 'hls.js'
+
+// Замените на ваш HLS-стрим или MP4-ссылку
+const VIDEO_SRC = null
+// Пример HLS: 'https://your-cdn.com/stream/playlist.m3u8'
+// Пример MP4: 'https://your-cdn.com/video/hero.mp4'
 
 const stats = [
   { value: '20+',   label: 'лет на рынке' },
-  { value: '3',     label: 'завода на Сахалине' },
+  { value: '3',     label: 'завода' },
   { value: '50+',   label: 'видов продукции' },
   { value: 'ХАССП', label: 'сертифицировано' },
 ]
 
 export default function Hero() {
+  const videoRef = useRef(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video || !VIDEO_SRC) return
+
+    if (VIDEO_SRC.includes('.m3u8')) {
+      if (Hls.isSupported()) {
+        const hls = new Hls({ autoStartLoad: true, startLevel: -1 })
+        hls.loadSource(VIDEO_SRC)
+        hls.attachMedia(video)
+        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}))
+        return () => hls.destroy()
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = VIDEO_SRC
+        video.play().catch(() => {})
+      }
+    } else {
+      video.src = VIDEO_SRC
+      video.play().catch(() => {})
+    }
+  }, [])
+
   return (
-    <section className="relative min-h-screen flex flex-col overflow-hidden grain-overlay" id="home">
+    <section className="relative h-screen overflow-hidden" id="home">
 
-      {/* Brand blue gradient — matches business card */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#1A3D72] via-[#122850] to-[#0D2140]" />
+      {/* Video */}
+      <video
+        ref={videoRef}
+        muted
+        loop
+        playsInline
+        poster="/mycaviar/img/hero.jpg"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
 
-      {/* Horizon glow */}
+      {/* Gradient overlays */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#060e1c] via-[#0D2140]/55 to-[#0D2140]/20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#060e1c]/75 via-[#0D2140]/20 to-transparent" />
+
+      {/* Subtle vignette */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 90% 50% at 50% 55%, rgba(31,66,128,0.6) 0%, transparent 70%)'
+        background: 'radial-gradient(ellipse 120% 100% at 75% 40%, transparent 40%, rgba(6,14,28,0.5) 100%)'
       }} />
 
-      {/* Subtle stars */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(35)].map((_, i) => (
-          <div key={i} className="absolute rounded-full bg-white" style={{
-            width:   (Math.random() * 1.5 + 0.5) + 'px',
-            height:  (Math.random() * 1.5 + 0.5) + 'px',
-            top:     Math.random() * 50 + '%',
-            left:    Math.random() * 100 + '%',
-            opacity: Math.random() * 0.3 + 0.05,
-          }} />
-        ))}
-      </div>
+      {/* Hero content — bottom-left */}
+      <div className="absolute bottom-0 left-0 right-0 z-10">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 pb-28 lg:pb-32">
 
-      {/* Horizon line */}
-      <div className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" style={{ top: '60%' }} />
-
-      {/* Content */}
-      <div className="relative z-10 flex-1 flex flex-col justify-center max-w-7xl mx-auto px-6 lg:px-10 pt-32 pb-16">
-        <div className="max-w-3xl">
-
-          <div className="fade-up flex items-center gap-3 mb-8">
-            <span className="h-px w-8 bg-gold/70" />
-            <span className="section-tag mb-0">Дальневосточные морепродукты</span>
+          {/* Tag */}
+          <div className="flex items-center gap-3 mb-6">
+            <span className="h-px w-10 bg-gold/60" />
+            <span className="text-[10px] tracking-[0.3em] uppercase text-gold/80 font-medium">
+              Дальневосточные морепродукты
+            </span>
           </div>
 
-          <h1 className="fade-up-1 font-display font-semibold leading-[0.92] mb-2">
-            <span className="block text-[clamp(52px,9vw,110px)] text-white tracking-[-0.01em]">
+          {/* Title */}
+          <h1 className="font-display font-light leading-[0.88] mb-8">
+            <span className="block text-[clamp(54px,10vw,130px)] text-white tracking-[-0.02em]">
               Охото&shy;морье
             </span>
-            <span className="block text-[clamp(18px,3vw,32px)] text-gold/80 tracking-[0.08em] font-normal mt-3 ml-1">
-              — поставщик красной икры
+            <span className="block text-[clamp(16px,2.4vw,28px)] text-white/45 tracking-[0.12em] font-normal mt-4 ml-1">
+              поставщик икры и морепродуктов
             </span>
           </h1>
 
-          <p className="fade-up-2 mt-6 text-white/65 text-base md:text-lg leading-relaxed max-w-xl font-light">
-            Оптовые поставки икры и морепродуктов с Дальнего Востока.
-            Собственное производство на Сахалине.{' '}
-            <span className="text-white/85">Двадцать лет надёжности.</span>
-          </p>
+          {/* Description + CTA */}
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
+            <div className="max-w-md">
+              <p className="text-white/60 text-sm md:text-base leading-relaxed font-light mb-8">
+                Оптовые поставки с Сахалина. Собственное производство.{' '}
+                <span className="text-white/85">Двадцать лет надёжности.</span>
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Link to="/catalog" className="btn-gold">
+                  Смотреть каталог
+                  <ArrowRight size={13} />
+                </Link>
+                <Link to="/contacts"
+                  className="flex items-center gap-2 px-5 py-3 text-xs tracking-widest uppercase text-white/70 border border-white/20 hover:border-gold/40 hover:text-white transition-all duration-300">
+                  Запросить прайс
+                </Link>
+              </div>
+            </div>
 
-          <div className="fade-up-3 flex flex-wrap gap-4 mt-10">
-            <Link to="/catalog" className="btn-gold">
-              Смотреть каталог
-              <ArrowRight size={14} />
-            </Link>
-            <Link to="/contacts" className="btn-white">
-              Запросить прайс
-            </Link>
+            {/* Stats */}
+            <div className="flex gap-px shrink-0">
+              {stats.map(s => (
+                <div key={s.label}
+                  className="bg-white/[0.04] backdrop-blur-md border border-white/[0.07] px-5 py-4 text-center min-w-[80px]">
+                  <div className="font-display text-xl text-gold leading-none">{s.value}</div>
+                  <div className="text-white/40 text-[9px] tracking-[0.15em] uppercase mt-1.5 leading-tight">{s.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="fade-up-4 mt-20 grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10 overflow-hidden border border-white/10">
-          {stats.map(s => (
-            <div key={s.label} className="bg-[#1A3D72]/60 backdrop-blur-sm px-6 py-5 text-center md:text-left">
-              <div className="font-display text-2xl md:text-3xl text-gold">{s.value}</div>
-              <div className="text-white/50 text-xs tracking-widest mt-1 uppercase">{s.label}</div>
-            </div>
-          ))}
-        </div>
+        {/* Bottom gradient fade into next section */}
+        <div className="h-16 bg-gradient-to-b from-transparent to-[#0D2140]" />
       </div>
 
-      {/* Ship at horizon */}
-      <div className="relative z-10 w-full">
-        <div className="h-12 bg-gradient-to-b from-transparent to-[#0D2140]" />
-        <div className="bg-[#0D2140] flex justify-center overflow-hidden">
-          <Ship className="w-full max-w-2xl text-[#122850] ship-float" style={{ marginBottom: '-2px' }} />
-        </div>
-        <div className="h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
-      </div>
-
-      <a href="#about" className="absolute bottom-6 right-10 hidden lg:flex flex-col items-center gap-2 text-white/30 hover:text-gold/60 transition-colors z-10" aria-label="Далее">
-        <ChevronDown size={14} className="animate-bounce" />
+      {/* Scroll hint */}
+      <a href="#about"
+        className="absolute bottom-8 right-10 hidden lg:flex flex-col items-center gap-2 text-white/25 hover:text-gold/50 transition-colors z-20"
+        aria-label="Далее">
+        <span className="text-[9px] tracking-[0.25em] uppercase rotate-90 mb-2">scroll</span>
+        <ChevronDown size={13} className="animate-bounce" />
       </a>
 
     </section>
