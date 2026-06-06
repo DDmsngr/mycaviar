@@ -4,7 +4,9 @@ import Ship from './Ship'
 
 export default function About() {
   return (
-    <section id="about" className="relative bg-[#0D2140] overflow-hidden py-28 grain-overlay">
+    <section id="about" className="relative overflow-hidden py-28 grain-overlay"
+      style={{ background: 'linear-gradient(to bottom, transparent 0px, #060e1c 100px, #0D2140 200px)' }}
+    >
       <Ship className="absolute -right-20 top-1/2 -translate-y-1/2 w-[600px] text-white/[0.03] pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10">

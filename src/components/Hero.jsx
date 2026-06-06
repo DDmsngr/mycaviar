@@ -1,9 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import Hls from 'hls.js'
-
-const VIDEO_SRC = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_064122_c4750c0e-7476-4b44-94a2-a85a65c63bf2.mp4'
 
 const stats = [
   { value: '20+',   label: 'лет на рынке' },
@@ -13,53 +11,33 @@ const stats = [
 ]
 
 export default function Hero() {
-  const videoRef = useRef(null)
+  const sectionRef = useRef(null)
 
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video || !VIDEO_SRC) return
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  })
 
-    if (VIDEO_SRC.includes('.m3u8')) {
-      if (Hls.isSupported()) {
-        const hls = new Hls({ autoStartLoad: true, startLevel: -1 })
-        hls.loadSource(VIDEO_SRC)
-        hls.attachMedia(video)
-        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}))
-        return () => hls.destroy()
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = VIDEO_SRC
-        video.play().catch(() => {})
-      }
-    } else {
-      video.src = VIDEO_SRC
-      video.play().catch(() => {})
-    }
-  }, [])
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, -140])
+  const overlayOpacity = useTransform(scrollYProgress, [0, 0.65], [1, 0.3])
 
   return (
-    <section className="relative h-screen overflow-hidden" id="home">
+    <section ref={sectionRef} className="relative h-screen overflow-hidden" id="home">
 
-      {/* Video */}
-      <video
-        ref={videoRef}
-        muted
-        loop
-        playsInline
-        poster="/mycaviar/img/hero.jpg"
-        className="absolute inset-0 w-full h-full object-cover"
-      />
+      {/* Gradient overlays — fade as user scrolls */}
+      <motion.div
+        style={{ opacity: overlayOpacity }}
+        className="absolute inset-0 pointer-events-none"
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-[#060e1c] via-[#0D2140]/55 to-[#0D2140]/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#060e1c]/75 via-[#0D2140]/20 to-transparent" />
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(ellipse 120% 100% at 75% 40%, transparent 40%, rgba(6,14,28,0.5) 100%)'
+        }} />
+      </motion.div>
 
-      {/* Gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#060e1c] via-[#0D2140]/55 to-[#0D2140]/20" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#060e1c]/75 via-[#0D2140]/20 to-transparent" />
-
-      {/* Subtle vignette */}
-      <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 120% 100% at 75% 40%, transparent 40%, rgba(6,14,28,0.5) 100%)'
-      }} />
-
-      {/* Hero content — bottom-left */}
-      <div className="absolute bottom-0 left-0 right-0 z-10">
+      {/* Hero content — parallax upward on scroll */}
+      <motion.div style={{ y: contentY }} className="absolute bottom-0 left-0 right-0 z-10">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 pb-28 lg:pb-32">
 
           {/* Tag */}
@@ -113,8 +91,8 @@ export default function Hero() {
         </div>
 
         {/* Bottom gradient fade into next section */}
-        <div className="h-16 bg-gradient-to-b from-transparent to-[#0D2140]" />
-      </div>
+        <div className="h-24 bg-gradient-to-b from-transparent to-[#060e1c]" />
+      </motion.div>
 
       {/* Scroll hint */}
       <a href="#about"
