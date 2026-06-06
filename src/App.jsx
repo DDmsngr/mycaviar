@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, ScrollRestoration } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import FAQ from './components/FAQ'
@@ -8,12 +9,14 @@ import AboutPage from './pages/AboutPage'
 import ContactsPage from './pages/ContactsPage'
 
 function ScrollToTop() {
-  return <ScrollRestoration />
+  const { pathname } = useLocation()
+  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  return null
 }
 
-export default function App() {
+function Layout() {
   return (
-    <BrowserRouter basename="/mycaviar">
+    <>
       <ScrollToTop />
       <Navbar />
       <main>
@@ -26,6 +29,14 @@ export default function App() {
       </main>
       <FAQ />
       <Footer />
+    </>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter basename="/mycaviar">
+      <Layout />
     </BrowserRouter>
   )
 }
