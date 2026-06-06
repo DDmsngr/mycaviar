@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
+import { Link, NavLink } from 'react-router-dom'
 import { Menu, X, Phone } from 'lucide-react'
 import Ship from './Ship'
 
 const links = [
-  { href: '#about',      label: 'О компании' },
-  { href: '#catalog',    label: 'Каталог' },
-  { href: '#clients',    label: 'Клиенты' },
-  { href: '#contact',    label: 'Контакты' },
+  { to: '/',         label: 'Главная' },
+  { to: '/catalog',  label: 'Каталог' },
+  { to: '/about',    label: 'О компании' },
+  { to: '/contacts', label: 'Контакты' },
 ]
 
 export default function Navbar() {
@@ -21,91 +22,88 @@ export default function Navbar() {
 
   return (
     <>
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? 'bg-navy/95 backdrop-blur-xl border-b border-white/5 shadow-[0_2px_30px_rgba(0,0,0,0.4)]'
-            : 'bg-transparent'
-        }`}
-      >
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${
+        scrolled
+          ? 'bg-[#0D2140]/95 backdrop-blur-xl border-b border-white/10 shadow-[0_2px_30px_rgba(0,0,0,0.3)]'
+          : 'bg-transparent'
+      }`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex items-center justify-between h-20">
 
-            {/* Logo */}
-            <a href="#" className="flex items-center gap-3 group">
-              <Ship className="w-14 h-8 text-gold opacity-70 group-hover:opacity-100 transition-opacity" />
+            <Link to="/" className="flex items-center gap-3 group">
+              <Ship className="w-14 h-8 text-white opacity-80 group-hover:opacity-100 transition-opacity" />
               <div>
-                <span className="block font-display text-lg font-semibold text-cream tracking-wider leading-none">
+                <span className="block font-display text-lg font-semibold text-white tracking-wider leading-none">
                   Охотоморье
                 </span>
-                <span className="block text-[9px] text-steel tracking-[0.3em] uppercase mt-0.5">
+                <span className="block text-[9px] text-white/50 tracking-[0.3em] uppercase mt-0.5">
                   Морепродукты
                 </span>
               </div>
-            </a>
+            </Link>
 
-            {/* Desktop nav */}
             <nav className="hidden lg:flex items-center gap-8">
               {links.map(l => (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  className="text-steel text-xs tracking-[0.15em] uppercase hover:text-cream transition-colors duration-200 relative group"
+                <NavLink
+                  key={l.to}
+                  to={l.to}
+                  end={l.to === '/'}
+                  className={({ isActive }) =>
+                    `text-xs tracking-[0.15em] uppercase transition-colors duration-200 relative group ${
+                      isActive ? 'text-gold' : 'text-white/70 hover:text-white'
+                    }`
+                  }
                 >
-                  {l.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-gold transition-all duration-300 group-hover:w-full" />
-                </a>
+                  {({ isActive }) => (
+                    <>
+                      {l.label}
+                      <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-300 ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`} />
+                    </>
+                  )}
+                </NavLink>
               ))}
             </nav>
 
-            {/* CTA */}
             <div className="hidden lg:flex items-center gap-4">
-              <a href="tel:+74951234567" className="flex items-center gap-1.5 text-steel text-xs hover:text-cream transition-colors">
+              <a href="tel:+79851490077" className="flex items-center gap-1.5 text-white/60 text-xs hover:text-white transition-colors">
                 <Phone size={12} className="text-gold" />
-                +7 (495) 123-45-67
+                +7 985 149-00-77
               </a>
-              <a href="#contact" className="btn-gold text-[10px] py-2.5 px-5">
+              <Link to="/contacts" className="btn-gold text-[10px] py-2.5 px-5">
                 Запросить прайс
-              </a>
+              </Link>
             </div>
 
-            {/* Mobile burger */}
-            <button
-              onClick={() => setOpen(!open)}
-              className="lg:hidden text-cream hover:text-gold transition-colors"
-              aria-label="Меню"
-            >
+            <button onClick={() => setOpen(!open)} className="lg:hidden text-white hover:text-gold transition-colors" aria-label="Меню">
               {open ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile menu */}
-      <div
-        className={`fixed inset-0 z-40 lg:hidden transition-opacity duration-300 ${
-          open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
-      >
-        <div className="absolute inset-0 bg-navy/98 backdrop-blur-xl" onClick={() => setOpen(false)} />
+      <div className={`fixed inset-0 z-40 lg:hidden transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+        <div className="absolute inset-0 bg-[#0D2140]/98 backdrop-blur-xl" onClick={() => setOpen(false)} />
         <div className="relative h-full flex flex-col justify-center items-center gap-8 pt-20">
           {links.map((l, i) => (
-            <a
-              key={l.href}
-              href={l.href}
+            <NavLink
+              key={l.to}
+              to={l.to}
+              end={l.to === '/'}
               onClick={() => setOpen(false)}
-              className="font-display text-3xl text-cream hover:text-gold transition-colors"
+              className={({ isActive }) =>
+                `font-display text-3xl transition-colors ${isActive ? 'text-gold' : 'text-white hover:text-gold'}`
+              }
               style={{ animationDelay: `${i * 60}ms` }}
             >
               {l.label}
-            </a>
+            </NavLink>
           ))}
-          <a href="#contact" onClick={() => setOpen(false)} className="btn-gold mt-4">
+          <Link to="/contacts" onClick={() => setOpen(false)} className="btn-gold mt-4">
             Запросить прайс
-          </a>
-          <a href="tel:+74951234567" className="flex items-center gap-2 text-steel text-sm">
+          </Link>
+          <a href="tel:+79851490077" className="flex items-center gap-2 text-white/60 text-sm">
             <Phone size={14} className="text-gold" />
-            +7 (495) 123-45-67
+            +7 985 149-00-77
           </a>
         </div>
       </div>
